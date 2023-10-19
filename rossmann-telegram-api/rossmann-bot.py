@@ -4,17 +4,7 @@ import requests
 
 from Flask import flask, request, Response
 
-# BOT token constant
-TOKEN = '6406278029:AAHkTUkj9tS2YJvzdo1l0yz6hQrSKQywwgY'
 
-# Info about BOT
-#https://api.telegram.org/bot6406278029:AAHkTUkj9tS2YJvzdo1l0yz6hQrSKQywwgY/getMe
-
-# get_update
-#https://api.telegram.org/bot6406278029:AAHkTUkj9tS2YJvzdo1l0yz6hQrSKQywwgY/getUpdates
-
-# get_update
-#https://api.telegram.org/bot6406278029:AAHkTUkj9tS2YJvzdo1l0yz6hQrSKQywwgY/sendMessage?chat_id
 
 def send_message( chat_id, text ):
     url = https://api.telegram.org/bot{}.format( TOKEN )
@@ -84,4 +74,3 @@ def index():
 if __name__ == '__main__':
     app.run( host='0.0.0.0', port=5000 )
 
-6406278029:AAHkTUkj9tS2YJvzdo1l0yz6hQrSKQywwgY

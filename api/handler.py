@@ -18,17 +18,17 @@ def rossmann_predict():
 
         # Unique Example
         if isinstance( test_json, dict ):
-            test_raw = pd.DataFrame( test_json, index=[0] )
+            df_test_raw = pd.DataFrame( test_json, index=[0] )
         
         # Multiple Examples
         else:
-            test_raw = pd.DataFrame( test_json, columns=test_json[0].keys() )
+            df_test_raw = pd.DataFrame( test_json, columns=test_json[0].keys() )
 
         # Instanciate Rossmann Class
         pipeline = Rossmann()
 
         # Data Cleaning
-        df1 = pipeline.data_cleaning( test_raw )
+        df1 = pipeline.data_cleaning( df_test_raw )
 
         # Feature Engineering
         df2 = pipeline.feature_engineering( df1 )
@@ -37,7 +37,7 @@ def rossmann_predict():
         df3 = pipeline.data_preparation( df2 )
 
         # Prediction
-        df_response = pipeline.get_prediction( model, test_raw, df3 )
+        df_response = pipeline.get_prediction( model, df_test_raw, df3 )
 
         return df_response
 

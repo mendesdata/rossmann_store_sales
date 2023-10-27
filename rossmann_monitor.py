@@ -94,25 +94,27 @@ def model_metrics( df ):
         return None
     
 def sales_predictions_byday_chart( df ):
+    df_grouped = df[['date', 'absolute_error', 'sales']].groupby( 'date' ).mean().reset_index()
+
     with st.container():
         fig = go.Figure()
-        fig.add_trace(go.Scatter( x=df['date'].values,
-                                  y=df['sales'].values/1000,
+        fig.add_trace(go.Scatter( x=df_grouped['date'].values,
+                                  y=df_grouped['absolute_error'].values,
                                   mode='lines',
-                                  name='sales',
+                                  name='Absolute error average',
                                   line=dict( color='royalblue' )
                                  ) )
         
-        fig.add_trace(go.Scatter( x=df['date'].values,
-                                  y=df['sales_predictions'].values/1000,
+        fig.add_trace(go.Scatter( x=df_grouped['date'].values,
+                                  y=df_grouped['sales'].values,
                                   mode='lines',
-                                  name='sales predictions',
+                                  name='sales average',
                                   line=dict( color='firebrick' )
                                   ) )
         
         fig.update_layout(title='Sales and Sales Predictions in the next 6 weeks',
                    xaxis_title='Dates',
-                   yaxis_title='Amount ( in thousands )')
+                   yaxis_title='Amount ( in millions )')
 
         st.plotly_chart( fig, use_container_width=True )
 
@@ -127,8 +129,8 @@ def error_distribuition_chart( df, MAPE_model ):
     df_error_level         = df[['store', 'absolute_error', 'sales']].groupby( 'store' ).mean().reset_index()
     df_error_level['MAPE'] = df_error_level['absolute_error'] / df_error_level['sales'] * 100
 
-    df_error_level['error_level'] = df_error_level['MAPE'].apply( lambda x : 'L1' if ( x <= half_MAPE_model )                                       else 
-                                                                             'L2' if ( ( x > half_MAPE_model ) & ( x <= MAPE_model ) )               else 
+    df_error_level['error_level'] = df_error_level['MAPE'].apply( lambda x : 'L1' if ( x <= half_MAPE_model )                                         else 
+                                                                             'L2' if ( ( x > half_MAPE_model ) & ( x <= MAPE_model ) )                else 
                                                                              'L3' if ( ( x > MAPE_model ) & ( x <= ( MAPE_model+half_MAPE_model ) ) ) else 
                                                                              'L4' )
     
@@ -141,7 +143,9 @@ def error_distribuition_chart( df, MAPE_model ):
     df_error_level['error_level_percentage'] = df_error_level['count'] / total_count * 100
     df_error_level['error_level_text']       = df_error_level['count'].astype(str) + ' (' + round( df_error_level['error_level_percentage'], 2 ).astype(str) + '%)'
     
-    fig = px.bar( df_error_level, x='error_level', y='count', text='error_level_text', labels={ 'error_level' : 'Error Level: \n<L1> Low  <L2> Medium  <L3> Medium High  <L4> High' })
+    fig = px.bar( df_error_level, x='error_level', y='count', text='error_level_text', 
+                  labels={ 'error_level' : 'Error Level: <L1> Low   <L2> Medium   <L3> Medium High   <L4> High',
+                           'count' : 'Store count' } )
     st.plotly_chart( fig, use_container_width=True )
 
     return None
@@ -186,26 +190,24 @@ def main():
     # sidebar area
     st.sidebar.markdown('# Filters')
 
-    option = st.sidebar.radio( "What's your favorite movie genre",
+    option = st.sidebar.radio( "How do you want to apply the model ?",
                                 ["All stores", "Score of stores", "Choose stores"],
                                 index=0 )
     
     if option == 'Score of stores':
-        score_radio = st.sidebar.radio( "What's your favorite movie genre",
+        score_radio = st.sidebar.radio( "What kind of score ?",
                                         ["Best", "Worst"],
                                         index=0 )
         
-        score_slider = st.sidebar.slider('How old are you?', min_value=1, max_value=100)
+        score_slider = st.sidebar.slider('Choose the range', min_value=1, max_value=x_test['store'].nunique())
     
     
     elif option == 'Choose stores':
         list_stores = x_test['store'].unique() 
 
-        choose_select = st.sidebar.multiselect ( 'Selecione os tipos de culinárias que deseja filtrar:',
-                                                list_stores,
-                                                )
+        choose_select = st.sidebar.multiselect ( 'Select stores:', list_stores )
     
-    button = st.sidebar.button('Apply Model')
+    button = st.sidebar.button('Apply Model', type='primary')
 
     if button:
         df_pred = apply_model( x_test )
@@ -220,7 +222,7 @@ def main():
 
         model_metrics( df_pred )
 
-        tab1, tab2, tab3 = st.tabs(['teste1', 'teste2', 'teste3'])
+        tab1, tab2, tab3 = st.tabs(['Sales and Sales Predictions by Day', 'Error Distribuition Chart', 'Stores Score Table'])
 
         with tab1: 
             sales_predictions_byday_chart( df_pred )   

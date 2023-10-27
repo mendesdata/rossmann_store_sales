@@ -17,8 +17,9 @@ class Rossmann( object ):
 
     def data_cleaning( self, df ):
         ## Rename Columns
-        cols_old = ['Store', 'DayOfWeek', 'Date', 'Open', 'Promo', 'StateHoliday', 'SchoolHoliday', 'StoreType', 'Assortment', 'CompetitionDistance',
+        cols_old = ['Store', 'DayOfWeek', 'Date', 'Customers', 'Open', 'Promo', 'StateHoliday', 'SchoolHoliday', 'StoreType', 'Assortment', 'CompetitionDistance',
                     'CompetitionOpenSinceMonth', 'CompetitionOpenSinceYear', 'Promo2', 'Promo2SinceWeek', 'Promo2SinceYear', 'PromoInterval']
+
 
         snakecase = lambda x: inflection.underscore( x )
         cols_new = list( map( snakecase, cols_old ) )
@@ -97,7 +98,7 @@ class Rossmann( object ):
         # open -> Se a loja está aberta ou não. Quando está fechada não há vendas, ou seja, devem ser consideradas apenas as linhas com loja aberta ( open != 0 )
         # sales -> Valor total em vendas. Quando não há vendas desconsiderar linhas ( sales > 0 )
         # colunas que foram criadas apenas para auxiliar a geração de outras também devem ser excluídas. Ex: promo_interval, month_map
-        cols_drop = ['open', 'promo_interval', 'month_map']
+        cols_drop = ['customers', 'open', 'promo_interval', 'month_map']
         df = df.drop( cols_drop, axis=1 )
 
         return df
@@ -107,7 +108,6 @@ class Rossmann( object ):
         df['competition_distance']   = self.competition_distance_scaler.fit_transform( df[['competition_distance']].values )
         df['competition_time_month'] = self.competition_time_month_scaler.fit_transform( df[['competition_time_month']].values )
         df['year']                   = self.year_scaler.fit_transform( df[['year']].values )
-
         df['store_type']             = self.store_type_scaler.fit_transform( df['store_type'] )
 
         # Apply One-Hot Encoding
@@ -125,7 +125,6 @@ class Rossmann( object ):
         df['day_of_week_sin'] = df['day_of_week'].apply( lambda x: np.sin( x * ( 2 * np.pi/7 ) ) )
         df['day_of_week_cos'] = df['day_of_week'].apply( lambda x: np.cos( x * ( 2 * np.pi/7 ) ) )
 
-
         # Calculate sin and cos 
         df['day_sin'] = df['day'].apply( lambda x: np.sin( x * ( 2 * np.pi/30 ) ) )
         df['day_cos'] = df['day'].apply( lambda x: np.cos( x * ( 2 * np.pi/30 ) ) )
@@ -137,7 +136,8 @@ class Rossmann( object ):
         # features selected 
         cols_selected = ['store', 'promo', 'store_type', 'assortment', 'competition_distance', 'competition_open_since_month',
                          'competition_open_since_year', 'promo2', 'promo2_since_week', 'promo2_since_year', 'competition_time_month', 'promo2_time_week', 
-                         'month_cos', 'day_of_week_sin', 'day_of_week_cos', 'day_sin', 'day_cos', 'week_of_year_cos', 'month_sin', 'week_of_year_sin']
+                         'day_of_week_sin', 'day_of_week_cos', 'day_sin', 'day_cos', 'week_of_year_sin', 'week_of_year_cos', 'month_sin', 'month_cos']
+        
 
         return df[cols_selected]
     
@@ -146,6 +146,6 @@ class Rossmann( object ):
         pred = model.predict( test_data )
 
         # join pred into original data
-        original_data['predictions'] = np.expm1( pred )
+        original_data['sales_predictions'] = np.expm1( pred )
 
         return original_data.to_json( orient='records', date_format='iso' )

@@ -8,12 +8,12 @@ import os
 
 class Rossmann( object ):
     def __init__(self):
-        self.path_params = os.environ.get( 'path_params', '/home/datamendes/comunidadeds/projetos/rossmann_store_sales')
-        self.competition_distance_scaler   = pickle.load( open( self.path_params + '/parameters/competition_distance_scaler.pkl', 'rb' ) )
-        self.promo2_time_week_scaler       = pickle.load( open( self.path_params + '/parameters/promo2_time_week_scaler.pkl', 'rb' ) )
-        self.competition_time_month_scaler = pickle.load( open( self.path_params + '/parameters/competition_time_month_scaler.pkl', 'rb' ) )
-        self.store_type_scaler             = pickle.load( open( self.path_params + '/parameters/store_type_scaler.pkl', 'rb' ) )
-        self.year_scaler                   = pickle.load( open( self.path_params + '/parameters/year_scaler.pkl', 'rb' ) )
+        self.path_params = os.environ.get( 'path_params', '/home/datamendes/comunidadeds/projetos/rossmann_store_sales/parameters/')
+        self.competition_distance_scaler   = pickle.load( open( self.path_params + 'competition_distance_scaler.pkl', 'rb' ) )
+        self.promo2_time_week_scaler       = pickle.load( open( self.path_params + 'promo2_time_week_scaler.pkl', 'rb' ) )
+        self.competition_time_month_scaler = pickle.load( open( self.path_params + 'competition_time_month_scaler.pkl', 'rb' ) )
+        self.store_type_scaler             = pickle.load( open( self.path_params + 'store_type_scaler.pkl', 'rb' ) )
+        self.year_scaler                   = pickle.load( open( self.path_params + 'year_scaler.pkl', 'rb' ) )
 
 
     def data_cleaning( self, df ):

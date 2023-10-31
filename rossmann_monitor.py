@@ -70,12 +70,11 @@ def apply_model( x_test ):
     data_json = json.dumps( x_test.to_dict( orient='records' ) )
 
     # local request
-    local_url = 'http://0.0.0.0:5000/rossmann/predict'
-    url = os.environ.get( 'url', local_url)
+    #local_url = 'http://0.0.0.0:5000/rossmann/predict'
+    #url = os.environ.get( 'url', local_url)
 
     # Render´s Server request
-    #url = 'https://rossmann-app-9l04.onrender.com/rossmann/predict'
-
+    url = 'https://rossmann-ws.onrender.com/rossmann/predict'
 
     # API CALL  
     header = { 'Content-type' : 'application/json' }

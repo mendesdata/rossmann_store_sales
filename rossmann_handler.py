@@ -2,10 +2,11 @@ from   flask             import Flask, request, Response
 from   api.rossmann.Rossmann import Rossmann
 import pandas as pd
 import pickle
-
+import os
 
 # loading model 
-model = pickle.load( open( '/home/datamendes/comunidadeds/projetos/rossmann_store_sales/model/model_rossmann.pkl', 'rb' ) )
+local_path_model = '/home/datamendes/comunidadeds/projetos/rossmann_store_sales/model/model_rossmann.pkl'
+model  = pickle.load( open( os.environ.get( 'path_model', local_path_model) , 'rb' ) )
 
 # Initialize API
 app = Flask( __name__ )
